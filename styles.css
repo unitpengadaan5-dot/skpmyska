@@ -1,0 +1,220 @@
+@import url('https://fonts.googleapis.com/css2?family=Arial:wght@400;700&display=swap');
+
+:root {
+    --border-color: #000;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    font-size: 11pt; /* Approx size from PDF */
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+}
+
+.document-container {
+    max-width: 21cm; /* A4 width */
+    margin: 20px auto;
+    background: white;
+    padding: 2cm; /* Assuming standard margins */
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.page {
+    /* Each page should handle its own content and break after if needed */
+    margin-bottom: 2cm;
+    page-break-after: always;
+}
+
+.page:last-child {
+    page-break-after: auto;
+}
+
+/* Print Styles */
+@media print {
+    @page {
+        size: landscape; /* A4/F4 landscape is standard for SKP */
+        margin: 1cm;
+    }
+    body {
+        background-color: white;
+    }
+    .document-container {
+        max-width: none;
+        margin: 0;
+        padding: 0;
+        box-shadow: none;
+    }
+    .no-print {
+        display: none !important;
+    }
+    .page {
+        margin-bottom: 0;
+    }
+}
+
+/* UI Styles */
+.floating-btn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 15px 25px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+    z-index: 1000;
+}
+.floating-btn:hover {
+    background-color: #0056b3;
+}
+
+/* App UI (Screen Only) */
+.app-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.app-header h1 {
+    margin: 0;
+    font-size: 24px;
+    color: #333;
+}
+
+.tabs {
+    display: flex;
+    gap: 10px;
+}
+
+.tab-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background: #e9ecef;
+    cursor: pointer;
+    font-weight: bold;
+    color: #495057;
+    transition: all 0.2s;
+}
+
+.tab-btn:hover {
+    background: #dde2e6;
+}
+
+.tab-btn.active {
+    background: #007bff;
+    color: white;
+}
+
+.view-section {
+    display: none;
+}
+.view-section.active {
+    display: block;
+}
+
+/* Form Styles */
+.form-section {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.form-section h2 {
+    margin-top: 0;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+    color: #2c3e50;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #555;
+}
+
+.form-group input, .form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+
+.form-row {
+    display: flex;
+    gap: 15px;
+}
+.form-row .form-group {
+    flex: 1;
+}
+
+.btn {
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    background: #28a745;
+    color: white;
+}
+.btn-danger {
+    background: #dc3545;
+}
+.btn:hover { opacity: 0.9; }
+
+.card {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    background: #f9f9f9;
+}
+
+/* Common Table Styles */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+}
+
+th, td {
+    border: 1px solid var(--border-color);
+    padding: 4px 6px;
+    vertical-align: top;
+}
+
+th {
+    text-align: center;
+    font-weight: bold;
+}
+
+.text-center { text-align: center; }
+.text-left { text-align: left; }
+.text-right { text-align: right; }
+.font-bold { font-weight: bold; }
+
+/* Specific Table tweaks will go here */

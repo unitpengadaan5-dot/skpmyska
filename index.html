@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi SKP</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container no-print">
+        <header class="app-header">
+            <h1>Aplikasi Pembuatan SKP</h1>
+            <div class="tabs">
+                <button id="tab-editor" class="tab-btn active">📝 Edit Data</button>
+                <button id="tab-preview" class="tab-btn">📄 Preview & Cetak</button>
+            </div>
+        </header>
+        
+        <main class="app-main">
+            <!-- Mode Editor -->
+            <section id="editor-view" class="view-section active">
+                <div id="form-container"></div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Mode Preview (Print Document) -->
+    <button id="printBtn" class="no-print floating-btn" style="display: none;">🖨️ Cetak Dokumen</button>
+    <div id="app" class="document-container" style="display: none;">
+        <!-- Konten dokumen cetak akan dirender di sini -->
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
