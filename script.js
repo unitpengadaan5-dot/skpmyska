@@ -255,6 +255,31 @@ function renderPerilakuKerja() {
     return rows;
 }
 
+function getSignatureDate() {
+    // Parse start date from periode e.g. "1 Juni s/d 31 Desember 2025" or "2 Januari s/d 31 Desember 2025"
+    const periode = data.periode || '';
+    const bulanIndo = {
+        'januari': 0, 'februari': 1, 'maret': 2, 'april': 3,
+        'mei': 4, 'juni': 5, 'juli': 6, 'agustus': 7,
+        'september': 8, 'oktober': 9, 'november': 10, 'desember': 11
+    };
+    const bulanNama = ['Januari','Februari','Maret','April','Mei','Juni',
+                       'Juli','Agustus','September','Oktober','November','Desember'];
+    // Match pattern: "<tanggal> <bulan> s/d ...  <tahun>"
+    const match = periode.match(/(\d+)\s+(\w+)\s+s\/d/i);
+    const yearMatch = periode.match(/(\d{4})/);
+    if (match && yearMatch) {
+        const tgl = match[1];
+        const bln = match[2].toLowerCase();
+        const tahun = parseInt(yearMatch[1]);
+        const blnIndex = bulanIndo[bln];
+        if (blnIndex !== undefined) {
+            return `Malang, ${tgl} ${bulanNama[blnIndex]} ${tahun + 1}`;
+        }
+    }
+    return 'Malang, ............. ';
+}
+
 function renderSignatures() {
     return `
         <div style="display: flex; justify-content: space-between; margin-top: 50px; text-align: center;">
@@ -266,7 +291,7 @@ function renderSignatures() {
                 ${data.pegawai.pangkat} NIP ${data.pegawai.nip}
             </div>
             <div style="width: 40%;">
-                Malang, 1 Juni 2025<br>
+                ${getSignatureDate()}<br>
                 PEJABAT PENILAI KINERJA<br>
                 <br><br><br><br>
                 ${data.pejabat.nama}<br>
@@ -357,8 +382,8 @@ function renderLampiranPage() {
         </div>
         
         <div style="display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 5px;">
-            <div>NAMA INSTANSI &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; RUMKIT TK.II 05.05.01 dr. SOEPRAOEN</div>
-            <div>Periode Penilaian : 1 Juni s/d 31 Desember 2025</div>
+            <div>NAMA INSTANSI &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ${data.instansi}</div>
+            <div>Periode Penilaian : ${data.periode}</div>
         </div>
 
         <table class="lampiran-table">
@@ -459,6 +484,7 @@ function renderUmpanBalikPage() {
             </tr>
             ${perilakuRows}
         </table>
+        ${renderSignatures()}
     </div>
     `;
 }
@@ -587,8 +613,8 @@ function renderDokumenFinal() {
             PERIODE : TRIWULAN I/II/III/IV-AKHIR
         </div>
         <div style="display: flex; justify-content: space-between; font-weight: bold; margin-bottom: 5px;">
-            <div>NAMA INSTANSI : RUMKIT TK.II 05.05.01 dr. SOEPRAOEN</div>
-            <div>PERIODE PENILAIAN: 1 JUNI S/D 31 DESEMBER 2025</div>
+            <div>NAMA INSTANSI : ${data.instansi}</div>
+            <div>PERIODE PENILAIAN: ${data.periode.toUpperCase()}</div>
         </div>
         
         <table>
@@ -633,14 +659,14 @@ function renderDokumenFinal() {
         <div style="display: flex; justify-content: space-between; margin-top: 50px; text-align: center;">
             <div style="width: 40%;">
                 <br>
-                10. Malang, 2 Januari 2026<br>
+                10. ${getSignatureDate()}<br>
                 PEGAWAI YANG DINILAI<br>
                 <br><br><br><br>
                 ${data.pegawai.nama}<br>
                 ${data.pegawai.pangkat} NIP ${data.pegawai.nip}
             </div>
             <div style="width: 40%;">
-                11. Malang, 2 Januari 2026<br>
+                11. ${getSignatureDate()}<br>
                 PEJABAT PENILAI KINERJA<br>
                 <br><br><br><br>
                 ${data.pejabat.nama}<br>
