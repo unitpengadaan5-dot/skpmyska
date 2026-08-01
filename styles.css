@@ -13,10 +13,10 @@ body {
 }
 
 .document-container {
-    max-width: 21cm; /* A4 width */
+    max-width: 28cm; /* Landscape width */
     margin: 20px auto;
     background: white;
-    padding: 2cm; /* Assuming standard margins */
+    padding: 1.5cm;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 

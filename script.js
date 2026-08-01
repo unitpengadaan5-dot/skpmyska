@@ -548,11 +548,51 @@ function renderEvaluasiPage() {
             <tr><td class="font-bold">ISTIMEWA/ BAIK/ BUTUH PERBAIKAN/ KURANG/ SANGAT KURANG</td></tr>
             <tr><td class="font-bold">POLA DISTRIBUSI</td></tr>
             <tr>
-                <td class="text-center" style="padding: 20px;">
-                    <!-- Placeholder for distribution curve image -->
-                    <div style="border: 1px solid #ccc; width: 60%; margin: 0 auto; height: 150px; display: flex; align-items: center; justify-content: center; background: #eef;">
-                        <span style="color: #666; font-style: italic;">[Grafik Kurva Distribusi Predikat Kinerja]</span>
-                    </div>
+                <td class="text-center" style="padding: 10px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="520" height="230" viewBox="0 0 520 230" style="font-family: Arial, sans-serif; font-size: 11px;">
+                      <!-- Title -->
+                      <text x="260" y="18" text-anchor="middle" font-weight="bold" font-size="12">KURVA DISTRIBUSI PREDIKAT KINERJA PEGAWAI DENGAN</text>
+                      <text x="260" y="33" text-anchor="middle" font-weight="bold" font-size="12">CAPAIAN KINERJA ORGANISASI BAIK</text>
+
+                      <!-- Chart area border -->
+                      <rect x="60" y="40" width="430" height="140" fill="white" stroke="#999" stroke-width="1"/>
+
+                      <!-- Grid lines horizontal -->
+                      <line x1="60" y1="75" x2="490" y2="75" stroke="#ddd" stroke-width="0.5"/>
+                      <line x1="60" y1="110" x2="490" y2="110" stroke="#ddd" stroke-width="0.5"/>
+                      <line x1="60" y1="145" x2="490" y2="145" stroke="#ddd" stroke-width="0.5"/>
+
+                      <!-- Grid lines vertical -->
+                      <line x1="146" y1="40" x2="146" y2="180" stroke="#ddd" stroke-width="0.5"/>
+                      <line x1="232" y1="40" x2="232" y2="180" stroke="#ddd" stroke-width="0.5"/>
+                      <line x1="318" y1="40" x2="318" y2="180" stroke="#ddd" stroke-width="0.5"/>
+                      <line x1="404" y1="40" x2="404" y2="180" stroke="#ddd" stroke-width="0.5"/>
+
+                      <!-- Distribution Curve - skewed right, peak at "Baik" (x~404) -->
+                      <path d="M 60,172 C 80,170 110,168 146,162 C 175,157 200,150 232,142 C 265,133 280,120 318,108 C 345,100 360,70 404,52 C 430,42 455,60 490,115" 
+                            fill="none" stroke="black" stroke-width="2.5" stroke-linejoin="round"/>
+
+                      <!-- Y-axis label -->
+                      <text x="12" y="100" text-anchor="middle" font-size="10" transform="rotate(-90, 12, 110)">Frekuensi</text>
+                      <text x="12" y="120" text-anchor="middle" font-size="10" transform="rotate(-90, 12, 120)">Pegawai</text>
+
+                      <!-- X-axis labels -->
+                      <text x="60"  y="198" text-anchor="middle" font-size="10">Sangat</text>
+                      <text x="60"  y="210" text-anchor="middle" font-size="10">Kurang</text>
+
+                      <text x="146" y="198" text-anchor="middle" font-size="10">Kurang/</text>
+                      <text x="146" y="210" text-anchor="middle" font-size="10">Misconduct</text>
+
+                      <text x="232" y="198" text-anchor="middle" font-size="10">Butuh</text>
+                      <text x="232" y="210" text-anchor="middle" font-size="10">Perbaikan</text>
+
+                      <text x="380" y="198" text-anchor="middle" font-size="10">Baik</text>
+
+                      <text x="490" y="198" text-anchor="middle" font-size="10">Sangat Baik</text>
+
+                      <!-- X-axis title -->
+                      <text x="260" y="225" text-anchor="middle" font-size="11">Predikat Kinerja Pegawai</text>
+                    </svg>
                 </td>
             </tr>
         </table>
