@@ -21,14 +21,17 @@ let defaultData = {
         pangkat: "Kolonel Ckm",
         jabatan: "Kepala",
         unitKerja: "Rumkit Tk.II 05.05.01 dr. Soepraoen Kesdam V/Brawijaya"
-    }
+    },
+    signaturePegawai: null,
+    signaturePejabat: null
 };
 
 let savedData = JSON.parse(localStorage.getItem('skp_data'));
 let data = savedData || defaultData;
-if(savedData && !savedData.atasan) {
-    data.atasan = defaultData.atasan;
-}
+if(savedData && !savedData.atasan) { data.atasan = defaultData.atasan; }
+if(!data.signaturePegawai) data.signaturePegawai = null;
+if(!data.signaturePejabat) data.signaturePejabat = null;
+
 
 function renderHeader(data) {
     return `
@@ -281,19 +284,25 @@ function getSignatureDate() {
 }
 
 function renderSignatures() {
+    const sigPegawai = data.signaturePegawai
+        ? `<img src="${data.signaturePegawai}" style="height:60px; max-width:180px; display:block; margin:0 auto;">` 
+        : `<br><br><br><br>`;
+    const sigPejabat = data.signaturePejabat
+        ? `<img src="${data.signaturePejabat}" style="height:60px; max-width:180px; display:block; margin:0 auto;">` 
+        : `<br><br><br><br>`;
     return `
         <div style="display: flex; justify-content: space-between; margin-top: 50px; text-align: center;">
             <div style="width: 40%;">
                 <br>
                 PEGAWAI YANG DINILAI<br>
-                <br><br><br><br>
+                ${sigPegawai}
                 ${data.pegawai.nama}<br>
                 ${data.pegawai.pangkat} NIP ${data.pegawai.nip}
             </div>
             <div style="width: 40%;">
                 ${getSignatureDate()}<br>
                 PEJABAT PENILAI KINERJA<br>
-                <br><br><br><br>
+                ${sigPejabat}
                 ${data.pejabat.nama}<br>
                 ${data.pejabat.pangkat} NRP ${data.pejabat.nip}
             </div>
@@ -690,14 +699,14 @@ function renderDokumenFinal() {
                 <br>
                 10. ${getSignatureDate()}<br>
                 PEGAWAI YANG DINILAI<br>
-                <br><br><br><br>
+                ${data.signaturePegawai ? `<img src="${data.signaturePegawai}" style="height:60px; max-width:180px; display:block; margin:0 auto;">` : `<br><br><br><br>`}
                 ${data.pegawai.nama}<br>
                 ${data.pegawai.pangkat} NIP ${data.pegawai.nip}
             </div>
             <div style="width: 40%;">
                 11. ${getSignatureDate()}<br>
                 PEJABAT PENILAI KINERJA<br>
-                <br><br><br><br>
+                ${data.signaturePejabat ? `<img src="${data.signaturePejabat}" style="height:60px; max-width:180px; display:block; margin:0 auto;">` : `<br><br><br><br>`}
                 ${data.pejabat.nama}<br>
                 ${data.pejabat.pangkat} NRP ${data.pejabat.nip}
             </div>
@@ -789,6 +798,31 @@ function renderForm() {
                 <div class="form-group">
                     <label>Konsekuensi <button class="btn" style="padding: 2px 8px; margin-left: 10px;" id="btnAddKonsekuensi">+</button></label>
                     <div id="konsekuensi-list"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="sig-section">
+            <h2 style="margin-top:0; border-bottom: 2px solid #f0f0f0; padding-bottom:10px; color:#2c3e50;">✍️ Tanda Tangan Digital</h2>
+            <p style="color:#666; font-size:13px; margin-bottom:15px;">Gambar tanda tangan langsung menggunakan kursor/touchscreen, atau unggah file gambar tanda tangan.</p>
+            <div class="sig-row">
+                <div class="sig-box">
+                    <label>Tanda Tangan PEGAWAI YANG DINILAI</label>
+                    <canvas id="canvas-pegawai" class="sig-canvas" width="400" height="150"></canvas>
+                    <div class="sig-controls">
+                        <button id="clear-pegawai" class="btn-sig-clear">🗑 Hapus</button>
+                        <label class="btn-sig-upload" for="upload-pegawai">📁 Upload Gambar</label>
+                        <input type="file" id="upload-pegawai" accept="image/*" style="display:none;">
+                    </div>
+                </div>
+                <div class="sig-box">
+                    <label>Tanda Tangan PEJABAT PENILAI KINERJA</label>
+                    <canvas id="canvas-pejabat" class="sig-canvas" width="400" height="150"></canvas>
+                    <div class="sig-controls">
+                        <button id="clear-pejabat" class="btn-sig-clear">🗑 Hapus</button>
+                        <label class="btn-sig-upload" for="upload-pejabat">📁 Upload Gambar</label>
+                        <input type="file" id="upload-pejabat" accept="image/*" style="display:none;">
+                    </div>
                 </div>
             </div>
         </div>
@@ -915,6 +949,193 @@ function bindGeneralInputs() {
             renderSimpleList(type, type + '-list');
         });
     });
+
+    // ===== SIGNATURE PAD =====
+    initSignaturePad('canvas-pegawai', 'signaturePegawai');
+    initSignaturePad('canvas-pejabat', 'signaturePejabat');
+
+    // Pre-fill canvas if signature exists
+    ['pegawai', 'pejabat'].forEach(who => {
+        const key = who === 'pegawai' ? 'signaturePegawai' : 'signaturePejabat';
+        if (data[key]) {
+            const canvas = document.getElementById('canvas-' + who);
+            const img = new Image();
+            img.onload = () => {
+                canvas.getContext('2d').drawImage(img, 0, 0);
+                canvas.classList.add('has-sig');
+            };
+            img.src = data[key];
+        }
+    });
+}
+
+// ===== SIGNATURE PAD LOGIC =====
+function initSignaturePad(canvasId, dataKey) {
+    const canvas = document.getElementById(canvasId);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
+    let lastX = 0, lastY = 0;
+
+    function getPos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        if (e.touches) {
+            return [(e.touches[0].clientX - rect.left) * scaleX, (e.touches[0].clientY - rect.top) * scaleY];
+        }
+        return [(e.clientX - rect.left) * scaleX, (e.clientY - rect.top) * scaleY];
+    }
+
+    function startDraw(e) { e.preventDefault(); drawing = true; [lastX, lastY] = getPos(e); }
+    function stopDraw() {
+        if (!drawing) return;
+        drawing = false;
+        canvas.classList.add('has-sig');
+        data[dataKey] = canvas.toDataURL();
+        saveData();
+    }
+    function draw(e) {
+        if (!drawing) return;
+        e.preventDefault();
+        const [x, y] = getPos(e);
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(x, y);
+        ctx.strokeStyle = '#000';
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+        [lastX, lastY] = [x, y];
+    }
+
+    canvas.addEventListener('mousedown', startDraw);
+    canvas.addEventListener('mousemove', draw);
+    canvas.addEventListener('mouseup', stopDraw);
+    canvas.addEventListener('mouseleave', stopDraw);
+    canvas.addEventListener('touchstart', startDraw, { passive: false });
+    canvas.addEventListener('touchmove', draw, { passive: false });
+    canvas.addEventListener('touchend', stopDraw);
+
+    // Clear button
+    const clearBtn = document.getElementById('clear-' + canvasId.split('-')[1]);
+    if (clearBtn) clearBtn.addEventListener('click', () => {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        canvas.classList.remove('has-sig');
+        data[dataKey] = null;
+        saveData();
+    });
+
+    // Upload button
+    const uploadInput = document.getElementById('upload-' + canvasId.split('-')[1]);
+    if (uploadInput) uploadInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            const img = new Image();
+            img.onload = () => {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+                const w = img.width * scale, h = img.height * scale;
+                ctx.drawImage(img, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
+                canvas.classList.add('has-sig');
+                data[dataKey] = canvas.toDataURL();
+                saveData();
+            };
+            img.src = ev.target.result;
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+// ===== DATABASE: SIMPAN & CARI =====
+function getSkpDatabase() {
+    return JSON.parse(localStorage.getItem('skp_database')) || [];
+}
+
+function saveSkpToDatabase() {
+    const db = getSkpDatabase();
+    const id = data.pegawai.nip + '_' + Date.now();
+    const record = {
+        id,
+        savedAt: new Date().toLocaleString('id-ID'),
+        nama: data.pegawai.nama,
+        nip: data.pegawai.nip,
+        jabatan: data.pegawai.jabatan,
+        periode: data.periode,
+        data: JSON.parse(JSON.stringify(data)),
+        hasilKerja: JSON.parse(JSON.stringify(hasilKerjaUtama)),
+        perilaku: JSON.parse(JSON.stringify(perilakuKerja)),
+        lampiran: JSON.parse(JSON.stringify(lampiranData))
+    };
+    // Cek apakah NIP sudah ada - update jika ada
+    const existingIdx = db.findIndex(r => r.nip === data.pegawai.nip);
+    if (existingIdx >= 0) {
+        record.id = db[existingIdx].id;
+        db[existingIdx] = record;
+        alert(`✅ Data SKP atas nama "${data.pegawai.nama}" berhasil diperbarui!`);
+    } else {
+        db.push(record);
+        alert(`✅ Data SKP atas nama "${data.pegawai.nama}" berhasil disimpan!`);
+    }
+    localStorage.setItem('skp_database', JSON.stringify(db));
+}
+
+function loadSkpFromDatabase(record) {
+    data = record.data;
+    if (!data.signaturePegawai) data.signaturePegawai = null;
+    if (!data.signaturePejabat) data.signaturePejabat = null;
+    hasilKerjaUtama = record.hasilKerja;
+    perilakuKerja = record.perilaku;
+    lampiranData = record.lampiran;
+    saveData();
+    renderForm();
+    document.getElementById('db-panel').style.display = 'none';
+    alert(`📂 Data SKP "${data.pegawai.nama}" berhasil dimuat!`);
+}
+
+function deleteSkpFromDatabase(id) {
+    if (!confirm('Yakin ingin menghapus data SKP ini?')) return;
+    let db = getSkpDatabase();
+    db = db.filter(r => r.id !== id);
+    localStorage.setItem('skp_database', JSON.stringify(db));
+    renderDbPanel();
+}
+
+function renderDbPanel(filter = '') {
+    const db = getSkpDatabase();
+    const dbList = document.getElementById('db-list');
+    const filtered = filter
+        ? db.filter(r => r.nama.toLowerCase().includes(filter.toLowerCase()) || r.nip.includes(filter))
+        : db;
+    if (filtered.length === 0) {
+        dbList.innerHTML = `<div class="db-empty">📭 Tidak ada data ditemukan.</div>`;
+        return;
+    }
+    dbList.innerHTML = filtered.map(r => `
+        <div class="db-item">
+            <div class="db-item-info">
+                <strong>${r.nama}</strong>
+                <span>NIP: ${r.nip} | ${r.jabatan} | Periode: ${r.periode}</span>
+                <span style="color:#aaa;">Disimpan: ${r.savedAt}</span>
+            </div>
+            <div>
+                <button class="btn-load" onclick="loadSkpFromDatabase(${JSON.stringify(r).replace(/"/g, '&quot;')})">📂 Buka</button>
+                <button class="btn-danger-sm" onclick="deleteSkpFromDatabase('${r.id}')">🗑️ Hapus</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function resetToNew() {
+    if (!confirm('Buat SKP baru? Data identitas pegawai yang dinilai akan dikosongkan. Data Pejabat, Hasil Kerja, dan Lampiran tetap dipertahankan.')) return;
+    // Hanya reset identitas PEGAWAI YANG DINILAI dan tanda tangannya
+    data.pegawai          = { nama: '', nip: '', pangkat: '', jabatan: '', unitKerja: '' };
+    data.signaturePegawai = null;
+    // pejabat, atasan, signaturePejabat, hasilKerjaUtama, lampiranData TIDAK direset
+    saveData();
+    renderForm();
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -946,7 +1167,24 @@ document.addEventListener('DOMContentLoaded', () => {
         printBtn.style.display = 'block';
     });
 
-    printBtn.addEventListener('click', () => {
-        window.print();
+    printBtn.addEventListener('click', () => { window.print(); });
+
+    // ===== TOOLBAR BUTTONS =====
+    document.getElementById('btnSimpan').addEventListener('click', saveSkpToDatabase);
+
+    document.getElementById('btnBaru').addEventListener('click', resetToNew);
+
+    document.getElementById('btnCari').addEventListener('click', () => {
+        const q = document.getElementById('searchInput').value.trim();
+        renderDbPanel(q);
+        document.getElementById('db-panel').style.display = 'block';
+    });
+
+    document.getElementById('searchInput').addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') document.getElementById('btnCari').click();
+    });
+
+    document.getElementById('btnTutupDb').addEventListener('click', () => {
+        document.getElementById('db-panel').style.display = 'none';
     });
 });

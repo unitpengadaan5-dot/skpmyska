@@ -3,18 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aplikasi SKP</title>
+    <title>Aplikasi SKP ASN</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="app-container no-print">
         <header class="app-header">
-            <h1>Aplikasi Pembuatan SKP</h1>
+            <h1>📋 Aplikasi Pembuatan SKP</h1>
             <div class="tabs">
                 <button id="tab-editor" class="tab-btn active">📝 Edit Data</button>
-                <button id="tab-preview" class="tab-btn">📄 Preview & Cetak</button>
+                <button id="tab-preview" class="tab-btn">📄 Preview &amp; Cetak</button>
             </div>
         </header>
+
+        <!-- Toolbar: Simpan, Cari, Database -->
+        <div class="toolbar no-print">
+            <div class="toolbar-left">
+                <button id="btnSimpan" class="btn btn-primary">💾 Simpan Data SKP</button>
+                <button id="btnBaru" class="btn btn-outline">➕ SKP Baru</button>
+            </div>
+            <div class="toolbar-right">
+                <input type="text" id="searchInput" placeholder="🔍 Cari nama atau NIP pegawai..." class="search-box">
+                <button id="btnCari" class="btn btn-search">Cari</button>
+            </div>
+        </div>
+
+        <!-- Panel Database Pegawai -->
+        <div id="db-panel" class="db-panel" style="display:none;">
+            <div class="db-panel-header">
+                <strong>📂 Data SKP Tersimpan</strong>
+                <button id="btnTutupDb" class="btn-close">✕</button>
+            </div>
+            <div id="db-list"></div>
+        </div>
         
         <main class="app-main">
             <!-- Mode Editor -->
